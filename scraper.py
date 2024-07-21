@@ -9,22 +9,24 @@ import csv
 import copy
 import threading
 import random
+import general as GENFUNC
 
 import constants as CONST
 
 
 class Scraper():
-    def __init__(self, data_lock, info_lock):
+    def __init__(self, inputs, data_lock, info_lock):
         self.client = httpx.Client(
             # enable http2
             http2=True,
             # add basic browser like headers to prevent being blocked
             headers=CONST.headers
         )
-        self.areas = []
+        self.inputs = inputs
         self.data_lock = data_lock # mutex for accessing data/ directory
         self.info_lock = info_lock # mutex for accessing running info
         self.shut_down = False # for turning thread off
+        
         self.page_regex = r'\d+_p\/'
         return
     
@@ -49,12 +51,17 @@ class Scraper():
                 try:
                     print("try scraping)")
                     results = []
-                    for area in self.areas:
+
+                    self.inputs.lock.acquire()
+                    areas = copy.copy(self.inputs.areas)
+                    self.inputs.lock.release()
+
+                    for area in areas:
                         results.append(self.scrape_location(area))
                     
                     self.data_lock.acquire()
-                    for area, result in zip(self.areas, results):
-                        self.convert_to_csv("data/" + self.location_convert(area) + ".csv", result)
+                    for area, result in zip(areas, results):
+                        self.convert_to_csv(CONST.DATA_DIRECTORY + GENFUNC.location_convert(area) + ".csv", result)
                     self.data_lock.release()
 
                     scrape_now = False
@@ -82,11 +89,6 @@ class Scraper():
         
         return scrape_thread
 
-    
-    def updateAreas(self, areas):
-        self.areas = copy.copy(areas)
-
-
     # location
     def scrape_location(self, location):
 
@@ -95,7 +97,7 @@ class Scraper():
 
         result = []
 
-        location_url = self.location_convert(location)
+        location_url = GENFUNC.location_convert(location)
         url = CONST.main_url + location_url + "/"
 
         while more_pages:
@@ -158,10 +160,6 @@ class Scraper():
                 house_dict[key] = None
 
         return house_dict
-    
-
-    def location_convert(self, location):
-        return location.replace(" ", "-").lower()
     
 
     # convert into CSVs

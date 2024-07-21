@@ -2,6 +2,10 @@
 
 SCRAPE_SLEEP_TIME = 5
 
+SQFT_IN_ACRE = 43560
+
+DATA_DIRECTORY = "data/"
+
 
 smtp_server = 'smtp.gmail.com'
 smtp_port = 465

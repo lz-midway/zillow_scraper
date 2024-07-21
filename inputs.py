@@ -9,16 +9,17 @@ RECEIVE_EMAIL = 2
 
 
 class Inputs():
-    def __init__(self, areas: list, send_email: str, send_email_password: str, receive_email: str):
+    def __init__(self, areas: list, send_email: str, send_email_password: str, receive_email: str, inputs_lock):
         self.areas = areas
         self.send_email = send_email
         self.send_email_password = send_email_password
         self.receive_email = receive_email
+        self.lock = inputs_lock # multi threading locks for accessing the inputs, acquire this before accessing any of its variables
         return
     
     # output formal representation of the object
     def __repr__(self):
-        return f'Inputs({repr(self.areas)}, \'{self.send_email}\', \'{self.send_email_password}\', \'{self.receive_email}\')'
+        return f'Inputs({repr(self.areas)}, \'{self.send_email}\', \'{self.send_email_password}\', \'{self.receive_email}\', {repr(self.inputs_lock)})'
     
     # read from file
     def readFromFile(self, file_name):

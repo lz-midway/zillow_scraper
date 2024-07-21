@@ -1,5 +1,13 @@
 A webscraping program for scraping housing data from Zillow and then automatically send them as emails
 
+input format (example):
+email_for_sending@gmail.com
+email_password
+target_email
+
+area1
+area2
+...
 
 
 
@@ -24,10 +32,11 @@ data_processor.py # a class for processing data scraped.
 Code structure:
 
 Inputs: this class stores the inputs, including areas needed to be scraped, email and email passwords (for automatically sending emails)
-    feed the result into email_sender, data_processor and scraper
+    this class is included in rest of the classes, shared and using a mutex to control access
 
 scraper: runs the entire scraping process, then output to data_processor, this output should be the list of houses without filtering
 
 data_processor: filter out the houses and store the resulting data, the result should be ready to package as email with little processing
+    resulting dataframe can be processed into a single email
 
-email_sender: pick up the email and package it and send it to the receiver
+email_sender: pick up the readied data, package it as an email and send it to the receiver

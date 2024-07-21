@@ -1,33 +1,40 @@
 import time
 import threading
+
 import inputs
 import email_sender
 import scraper
-
+import data_processor
 
 
 def main():
-    input_process = inputs.Inputs([], None, None, None)
+
+    inputs_lock = threading.Lock()
+
+    input_process = inputs.Inputs([], None, None, None, inputs_lock)
 
     print("input created")
     
-    input_process.readFromFile("input.txt")
+    inputs_lock.acquire()
+    if not input_process.readFromFile("input.txt"):
+        return 1
+    inputs_lock.release()
 
     data_lock = threading.Lock()
     info_lock = threading.Lock()
 
-    email_process = email_sender.EmailSender(input_process.send_email, 
-                                             input_process.send_email_password,
-                                             input_process.receive_email,
+    email_process = email_sender.EmailSender(input_process,
                                              threading.Event(),
                                              data_lock)
     
-    scraper_process = scraper.Scraper(data_lock, info_lock)
-
-    scraper_process.updateAreas(input_process.areas)
+    scraper_process = scraper.Scraper(input_process, data_lock, info_lock)
     
+    # start the threads
     ethread = email_process.startThread()
     sthread = scraper_process.startThread()
+
+
+    
 
     print("thread started")
 
