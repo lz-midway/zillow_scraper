@@ -14,6 +14,9 @@ class Inputs():
         self.send_email = send_email
         self.send_email_password = send_email_password
         self.receive_email = receive_email
+
+        self.to_change = False # for communication between scraper and data_processor, False means no need to reprocess data
+        self.to_send_email = False # for communication between data_processor, False means not ready to send email
         self.lock = inputs_lock # multi threading locks for accessing the inputs, acquire this before accessing any of its variables
         return
     

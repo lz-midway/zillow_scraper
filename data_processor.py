@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import threading
 import copy
+import time
 
 import general as GENFUNC
 import constants as CONST
@@ -19,6 +20,9 @@ class DataProcessor():
         return
     
     def dataThread(self):
+        process_data = True
+
+        slept_cycle = 0
 
         while True:
             self.info_lock.acquire()
@@ -29,16 +33,45 @@ class DataProcessor():
             
             self.inputs.lock.acquire()
             areas = copy.copy(self.inputs.areas)
+            to_change = copy.copy(self.inputs.to_change)
             self.inputs.lock.release()
 
-            for area in areas:
-                file_name = CONST.DATA_DIRECTORY + GENFUNC.location_convert(area) + ".csv"
+            if to_change and process_data: # if there is update and need to process new scraped data
+                print("processor updating")
+                result_dfs = []
 
-                df = pd.read_csv(file_name)
+                # iterate through each area
+                for area in areas:
+                    file_name = CONST.DATA_DIRECTORY + GENFUNC.location_convert(area) + ".csv"
 
-                result_df = self.getHousesBelowAverage(df)
+                    df = pd.read_csv(file_name)
+
+                    result_df = self.getHousesBelowAverage(df)
+                    # sort by unitprice, then livinglotratio, then get head amount
+                    result_df = result_df.sort_values(by=['unitprice','livinglotratio']).head(CONST.HEAD)
+
+                    result_dfs.append(result_df)
+
+                self.writeFilteredData(result_dfs, CONST.DATA_DIRECTORY + CONST.READIED_DATA)
+
+                self.inputs.lock.acquire()
+                self.inputs.to_change = False
+                self.inputs.to_send_email = True
+                self.inputs.lock.release()
+
+                process_data = False
+                slept_cycle = 0
+
+            else: # sleep when there is nothing to do
+                print("processor sleeping")
+                time.sleep(CONST.SLEEP_CYCLE_TIME)
+                slept_cycle += 1
+
+                if slept_cycle > CONST.DATAPROCESS_SLEEP_CYCLE:
+                    process_data = True
 
 
+            
 
         return
     
@@ -48,6 +81,16 @@ class DataProcessor():
         data_thread.start()
 
         return data_thread
+    
+
+    def writeFilteredData(self, result_dfs, file_name):
+        self.data_lock.acquire()
+        with open(file_name, "w") as file:
+            for df in result_dfs:
+                file.write(df.to_string())
+                file.write("\n\n")
+        self.data_lock.release()
+        return
     
 
     def getHousesBelowAverage(self, df):

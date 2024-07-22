@@ -18,7 +18,7 @@ class EmailSender():
     def senderThread(self):
         while not self.event.is_set():
             schedule.run_pending()
-            time.sleep(5)
+            time.sleep(10)
 
     def startThread(self):
         schedule.every().second.do(self.send)
@@ -29,10 +29,18 @@ class EmailSender():
     
     # function that is run everytime an email need to be sent
     def send(self):
+        self.inputs.lock.acquire()
+        if not self.inputs.to_send_email:
+            self.inputs.lock.release()
+            return
+        self.inputs.lock.release()
+        
         self.data_lock.acquire()
-        print("email data lock acquired")
+        # print("email data lock acquired")
+        with open(CONST.DATA_DIRECTORY + CONST.READIED_DATA, "r") as file:
+            data_lines = file.readlines()
         self.data_lock.release()
-        print("email data lock released")
+        # print("email data lock released")
 
         with smtplib.SMTP_SSL(CONST.smtp_server, CONST.smtp_port) as smtp:
             # acquire lock and get the inputs information
@@ -43,7 +51,8 @@ class EmailSender():
             self.inputs.lock.release()
 
             subject = "test_email"
-            body = ["test 1", "test 2"]
+            # body = ["test 1", "test 2"]
+            body = data_lines
             smtp.login(send_email, send_email_password)
 
             message = "Subject: " + str(subject) + "\n\n" + "\n".join(body)
@@ -52,3 +61,4 @@ class EmailSender():
 
             smtp.sendmail(send_email, receive_email, message)
 
+            print("email sent")

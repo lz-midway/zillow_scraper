@@ -37,6 +37,8 @@ class Scraper():
 
         scrape_now = True
 
+        slept_cycle = 0
+
         # main loop
         while True:
             self.info_lock.acquire()
@@ -48,6 +50,9 @@ class Scraper():
             # when time to scrape
             if scrape_now:
                 print("scrap now true")
+
+                slept_cycle = 0
+
                 try:
                     print("try scraping)")
                     results = []
@@ -67,6 +72,10 @@ class Scraper():
                     scrape_now = False
 
                     print("scrap now done")
+
+                    self.inputs.lock.acquire()
+                    self.inputs.to_change = True
+                    self.inputs.lock.release()
                     
                 except AssertionError:
                     print("blocked by website")
@@ -76,8 +85,10 @@ class Scraper():
             else: # should not be scraping
                 # other things
                 print("scraper sleeping")
-                time.sleep(CONST.SCRAPE_SLEEP_TIME) # sleep since it is not time to scrape
-
+                time.sleep(CONST.SLEEP_CYCLE_TIME) # sleep since it is not time to scrape
+                slept_cycle += 1
+                if slept_cycle > CONST.SCRAPE_SLEEP_CYCLE:
+                    scrape_now = True
 
 
         return

@@ -21,24 +21,26 @@ def main():
     inputs_lock.release()
 
     data_lock = threading.Lock()
-    info_lock = threading.Lock()
+    info_lock_scrape = threading.Lock()
+    info_lock_data = threading.Lock()
 
     email_process = email_sender.EmailSender(input_process,
                                              threading.Event(),
                                              data_lock)
     
-    scraper_process = scraper.Scraper(input_process, data_lock, info_lock)
+    scraper_process = scraper.Scraper(input_process, data_lock, info_lock_scrape)
+    data_process = data_processor.DataProcessor(input_process, data_lock, info_lock_data)
     
     # start the threads
     ethread = email_process.startThread()
     sthread = scraper_process.startThread()
-
+    dthread = data_process.startThread()
 
     
 
     print("thread started")
 
-    time.sleep(10)
+    time.sleep(60)
 
     email_process.event.set()
 
@@ -48,11 +50,16 @@ def main():
 
     print("ethread ended")
 
-    info_lock.acquire()
+    info_lock_scrape.acquire()
     scraper_process.shut_down = True
-    info_lock.release()
+    info_lock_scrape.release()
+
+    info_lock_data.acquire()
+    data_process.shut_down = True
+    info_lock_data.release()
 
     sthread.join()
+    dthread.join()
 
     print("complete")
     

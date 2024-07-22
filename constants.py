@@ -1,10 +1,16 @@
+HEAD = 5 # number of rows taken to be sent via email
 
+SCRAPE_SLEEP_CYCLE = 5
 
-SCRAPE_SLEEP_TIME = 5
+DATAPROCESS_SLEEP_CYCLE = 5
+
+SLEEP_CYCLE_TIME = 10 # length of time for cycles to sleep
 
 SQFT_IN_ACRE = 43560
 
 DATA_DIRECTORY = "data/"
+
+READIED_DATA = "readied_data.txt"
 
 
 smtp_server = 'smtp.gmail.com'
