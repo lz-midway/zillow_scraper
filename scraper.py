@@ -93,6 +93,38 @@ class Scraper():
 
         return
     
+    # Task functions are not to be used at the sametime with the threads
+    def scraperTask(self):
+        # for using the schedule library to control schedule
+        print("scrap now true")
+
+        try:
+            print("try scraping)")
+            results = []
+
+            self.inputs.lock.acquire()
+            areas = copy.copy(self.inputs.areas)
+            self.inputs.lock.release()
+
+            for area in areas:
+                results.append(self.scrape_location(area))
+            
+            self.data_lock.acquire()
+            for area, result in zip(areas, results):
+                self.convert_to_csv(CONST.DATA_DIRECTORY + GENFUNC.location_convert(area) + ".csv", result)
+            self.data_lock.release()
+
+            print("scrap now done")
+
+            self.inputs.lock.acquire()
+            self.inputs.to_change = True
+            self.inputs.lock.release()
+            
+        except AssertionError:
+            print("blocked by website")
+
+        return
+    
     # for starting the scraperThread(), returns the running thread for stopping
     def startThread(self):
         scrape_thread = threading.Thread(target=self.scraperThread, args=[])

@@ -71,9 +71,47 @@ class DataProcessor():
                     process_data = True
 
 
-            
+        return
+    
+
+    # Task functions are not to be used at the sametime with the threads
+    def dataTask(self):
+        # for running regular timed tasks using a scheduler
+        
+        self.inputs.lock.acquire()
+        areas = copy.copy(self.inputs.areas)
+        to_change = copy.copy(self.inputs.to_change)
+        self.inputs.lock.release()
+
+        if to_change: # if there is update and need to process new scraped data
+            print("processor updating")
+            result_dfs = []
+
+            # iterate through each area
+            for area in areas:
+                file_name = CONST.DATA_DIRECTORY + GENFUNC.location_convert(area) + ".csv"
+
+                df = pd.read_csv(file_name, dtype=CONST.column_dtype)
+
+                result_df = self.getHousesBelowAverage(df)
+                # sort by unitprice, then livinglotratio, then get head amount
+                result_df = result_df.sort_values(by=['unitprice','livinglotratio']).head(CONST.HEAD)
+
+                result_dfs.append(result_df)
+
+            self.writeFilteredData(result_dfs, CONST.DATA_DIRECTORY + CONST.READIED_DATA)
+
+            self.inputs.lock.acquire()
+            self.inputs.to_change = False
+            self.inputs.to_send_email = True
+            self.inputs.lock.release()
+
+        else:
+            # sleep
+            print("nothing to do, processor sleeping")
 
         return
+            
     
 
     def startThread(self):

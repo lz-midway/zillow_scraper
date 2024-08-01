@@ -1,6 +1,6 @@
 A webscraping program for scraping housing data from Zillow and then automatically send them as emails
 
-input format (example):
+input format (example, put the result in a file named input.txt):
 email_for_sending@gmail.com
 email_password
 target_email

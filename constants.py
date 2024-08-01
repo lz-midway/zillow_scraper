@@ -1,3 +1,5 @@
+import numpy as np
+
 HEAD = 5 # number of rows taken to be sent via email
 
 SCRAPE_SLEEP_CYCLE = 5
@@ -60,3 +62,17 @@ fields_order = [
     "detailUrl"
 ]
 
+
+column_dtype = {
+    "zpid": np.int64,
+    "price": np.int64,
+    "livingArea": np.int64,
+    "streetAddress": str,
+    "zipcode": np.int64,
+    "city": str,
+    "state": str,
+    "homeType": str,
+    "homeStatus": str,
+    "lotAreaValue": np.float64,
+    "lotAreaUnit": str
+}

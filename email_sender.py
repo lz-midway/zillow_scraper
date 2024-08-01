@@ -28,6 +28,7 @@ class EmailSender():
         return st
     
     # function that is run everytime an email need to be sent
+    # use this either with schedule in main, or with the threading mechanism above
     def send(self):
         self.inputs.lock.acquire()
         if not self.inputs.to_send_email:
