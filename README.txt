@@ -13,9 +13,9 @@ area2
 
 Directory structure:
 
-data/ # directiory for storing housing data
+data/ # directiory for storing housing data and input configuration
 
-input.txt # for storing input such as housing regions, etc
+data/input.txt # for storing input such as housing regions, etc
 
 main.py # the main running loop
 
@@ -27,12 +27,14 @@ scraper.py # a class for gathering webpages from Zillow
 
 data_processor.py # a class for processing data scraped.
 
+user_interface.py # a program run separately to update configuration when the program is running
 
 
 Code structure:
 
 Inputs: this class stores the inputs, including areas needed to be scraped, email and email passwords (for automatically sending emails)
     this class is included in rest of the classes, shared and using a mutex to control access
+    this class also include part for receiving new inputs from a socket
 
 scraper: runs the entire scraping process, then output to data_processor, this output should be the list of houses without filtering
 
@@ -40,3 +42,5 @@ data_processor: filter out the houses and store the resulting data, the result s
     resulting dataframe can be processed into a single email
 
 email_sender: pick up the readied data, package it as an email and send it to the receiver
+
+user_interface: a separate program for updating user interface, the user interface and the input connect through port number 3124

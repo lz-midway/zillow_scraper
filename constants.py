@@ -14,6 +14,20 @@ DATA_DIRECTORY = "data/"
 
 READIED_DATA = "readied_data.txt"
 
+END_SYMBOL = "&" # this is used as the end symbol for updating new inputs, this symbol isn't allowed in email addresses or mailing addresses
+
+
+# for inputs
+INPUT_CONFIG_FILE = "data/input.txt"
+
+SEND_EMAIL = 0
+SEND_EMAIL_PASSWORD = 1
+RECEIVE_EMAIL = 2
+
+AREA_START = 4
+
+PORT_NUM = 3124
+
 
 smtp_server = 'smtp.gmail.com'
 smtp_port = 465

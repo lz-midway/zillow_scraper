@@ -73,6 +73,8 @@ class Scraper():
 
                     print("scrap now done")
 
+
+                    # TODO: adjust to account for changing input configuration
                     self.inputs.lock.acquire()
                     self.inputs.to_change = True
                     self.inputs.lock.release()
@@ -117,7 +119,10 @@ class Scraper():
             print("scrap now done")
 
             self.inputs.lock.acquire()
-            self.inputs.to_change = True
+            areas_updated = copy.copy(self.inputs.areas)
+            if set(areas) == set(areas_updated): # if after acquiring lock, the input area matches, then data is ok
+                self.inputs.to_change = True
+                self.inputs.input_changed = False 
             self.inputs.lock.release()
             
         except AssertionError:

@@ -6,6 +6,7 @@ import inputs
 import email_sender
 import scraper
 import data_processor
+import constants as CONST
 
 
 def main():
@@ -13,13 +14,14 @@ def main():
     # V1: uses pure scheduler and does not clean up threads
 
     inputs_lock = threading.Lock()
+    input_thread_lock = threading.Lock() # for controlling the input thread that updates the input configuration
 
-    input_process = inputs.Inputs([], None, None, None, inputs_lock)
+    input_process = inputs.Inputs([], None, None, None, input_thread_lock, inputs_lock)
 
     print("input created")
     
     inputs_lock.acquire()
-    if not input_process.readFromFile("input.txt"):
+    if not input_process.readFromFile(CONST.INPUT_CONFIG_FILE):
         return 1
     inputs_lock.release()
 
@@ -40,19 +42,31 @@ def main():
         return job_thread
     
     schedule.every(30).seconds.do(run_threaded, email_process.send)
-    schedule.every(60).seconds.do(run_threaded, scraper_process.scraperTask)
+    schedule.every(30).seconds.do(run_threaded, scraper_process.scraperTask)
     schedule.every(30).seconds.do(run_threaded, data_process.dataTask)
 
-    time_length = 130
+    it = input_process.startThread()
 
+    time_lapsed = 0
+    time_length = 250
     start_time = time.perf_counter()
 
-    for n in range(time_length):
+    while True:
+
         schedule.run_pending()
         time.sleep(1)
+        time_lapsed += 1
+
+        if time_lapsed >= time_length:
+            break
+
+    input_process.thread_lock.acquire()
+    input_process.shut_down = True
+    input_process.thread_lock.release()
+
+    it.join()
 
     print(time.perf_counter() - start_time)
-
 
 
     # prototype, using a mix of sleep and scheduler

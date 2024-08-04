@@ -81,9 +81,10 @@ class DataProcessor():
         self.inputs.lock.acquire()
         areas = copy.copy(self.inputs.areas)
         to_change = copy.copy(self.inputs.to_change)
+        input_changed = copy.copy(self.inputs.input_changed)
         self.inputs.lock.release()
 
-        if to_change: # if there is update and need to process new scraped data
+        if to_change and not input_changed: # if there is update and need to process new scraped data, and input configuration is not changed
             print("processor updating")
             result_dfs = []
 
