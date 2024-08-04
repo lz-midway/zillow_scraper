@@ -71,6 +71,8 @@ class Inputs():
                 self.input_changed = True
                 self.lock.release()
 
+                print("input config updated")
+
                 # write the updated configuration to the input.txt file
                 self.lock.acquire()
                 self.writeToFile(CONST.INPUT_CONFIG_FILE)

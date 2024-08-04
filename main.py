@@ -41,14 +41,14 @@ def main():
         job_thread.start()
         return job_thread
     
-    schedule.every(30).seconds.do(run_threaded, email_process.send)
-    schedule.every(30).seconds.do(run_threaded, scraper_process.scraperTask)
-    schedule.every(30).seconds.do(run_threaded, data_process.dataTask)
+    schedule.every(60).seconds.do(run_threaded, email_process.send)
+    schedule.every(120).seconds.do(run_threaded, scraper_process.scraperTask)
+    schedule.every(60).seconds.do(run_threaded, data_process.dataTask)
 
     it = input_process.startThread()
 
     time_lapsed = 0
-    time_length = 250
+    time_length = CONST.TEST_RUNTIME
     start_time = time.perf_counter()
 
     while True:

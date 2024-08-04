@@ -152,7 +152,7 @@ class Scraper():
             # get each page
             webpage = self.client.get(url + pages)
 
-            print("processing pages " + location)
+            print("scraping pages " + location)
 
             assert webpage.status_code == 200, "request blocked"
 
