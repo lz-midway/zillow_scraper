@@ -57,7 +57,9 @@ running instructions
     make sure there is a file named "input.txt" in data/
     there is also a file named "user_input.txt" in the main Directory
     then run
-        python3 main.py
+        python3 main.py <runtime-optional>
+    if runtime is not provided, it runs for 300 seconds
+    if runtime is negative, it runs forever
 
     for updating during when program is running
         python3 user_interface.py

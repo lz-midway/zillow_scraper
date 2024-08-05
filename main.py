@@ -1,6 +1,7 @@
 import time
 import threading
 import schedule
+import sys
 
 import inputs
 import email_sender
@@ -48,7 +49,20 @@ def main():
     it = input_process.startThread()
 
     time_lapsed = 0
-    time_length = CONST.TEST_RUNTIME
+    time_length = 0
+    forever = False
+    if len(sys.argv) <= 1:
+        time_length = CONST.TEST_RUNTIME
+    elif int(sys.argv[1]) < 0:
+        forever = True
+    else:
+        time_length = int(sys.argv[1])
+
+    if forever:
+        print("always running")
+    else:
+        print("runtime: " + str(time_length))
+
     start_time = time.perf_counter()
 
     while True:
@@ -57,7 +71,7 @@ def main():
         time.sleep(1)
         time_lapsed += 1
 
-        if time_lapsed >= time_length:
+        if not forever and time_lapsed >= time_length:
             break
 
     input_process.thread_lock.acquire()
