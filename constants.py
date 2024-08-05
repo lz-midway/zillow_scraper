@@ -19,7 +19,7 @@ END_SYMBOL = "&" # this is used as the end symbol for updating new inputs, this 
 
 # for inputs
 TEST_RUNTIME = 300
-EMAIL_SENDER_TIMEOUT = 60
+EMAIL_SENDER_TIMEOUT = 90
 SCRAPER_TIMEOUT = 80
 DATA_PROCESS_TIMEOUT = 60
 INPUT_CONFIG_FILE = "data/input.txt"

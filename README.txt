@@ -54,6 +54,8 @@ user_interface: a separate program for updating input configuration while the pr
     The user interface and the input connect through port number 3124 and currently connects through localhost IP
 
 running instructions
+    install instruction: run
+        pip install -r requirements.txt
     make sure there is a file named "input.txt" in data/
     there is also a file named "user_input.txt" in the main Directory
     then run
