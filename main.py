@@ -41,9 +41,9 @@ def main():
         job_thread.start()
         return job_thread
     
-    schedule.every(60).seconds.do(run_threaded, email_process.send)
-    schedule.every(120).seconds.do(run_threaded, scraper_process.scraperTask)
-    schedule.every(60).seconds.do(run_threaded, data_process.dataTask)
+    schedule.every(CONST.EMAIL_SENDER_TIMEOUT).seconds.do(run_threaded, email_process.send)
+    schedule.every(CONST.SCRAPER_TIMEOUT).seconds.do(run_threaded, scraper_process.scraperTask)
+    schedule.every(CONST.DATA_PROCESS_TIMEOUT).seconds.do(run_threaded, data_process.dataTask)
 
     it = input_process.startThread()
 
