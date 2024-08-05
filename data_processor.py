@@ -90,9 +90,11 @@ class DataProcessor():
 
             # iterate through each area
             for area in areas:
+                self.data_lock.acquire()
                 file_name = CONST.DATA_DIRECTORY + GENFUNC.location_convert(area) + ".csv"
 
                 df = pd.read_csv(file_name, dtype=CONST.column_dtype)
+                self.data_lock.release()
 
                 result_df = self.getHousesBelowAverage(df)
                 # sort by unitprice, then livinglotratio, then get head amount
